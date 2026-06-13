@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Charlas SST - 5 Minutos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-comments me-2 text-primary"></i>Charlas de 5 Minutos - SST</h2>
+    <a href="{{ url_for('nueva_charla') }}" class="btn btn-cv"><i class="fas fa-plus me-2"></i>Nueva Charla</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card card-kpi kpi-green p-3 text-center">
+            <h3>{{ charlas|length }}</h3>
+            <small>Total Charlas</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-kpi kpi-blue p-3 text-center">
+            <h3>{{ charlas|sum(attribute='cantidad_asistentes') }}</h3>
+            <small>Total Asistentes</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-kpi kpi-purple p-3 text-center">
+            <h3>{{ charlas|map(attribute='duracion_minutos')|sum }} min</h3>
+            <small>Tiempo Total</small>
+        </div>
+    </div>
+</div>
+
+<div class="table-custom">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr><th>Fecha</th><th>Tema</th><th>Instructor</th><th>Duracion</th><th>Asistentes</th><th>Resumen</th><th>Evidencia</th></tr>
+        </thead>
+        <tbody>
+            {% for c in charlas %}
+            <tr>
+                <td>{{ c.fecha }}</td>
+                <td><strong>{{ c.tema }}</strong></td>
+                <td>{{ c.instructor_nombre }}</td>
+                <td>{{ c.duracion_minutos }} min</td>
+                <td>{{ c.cantidad_asistentes }} personas</td>
+                <td>{{ c.resumen[:80] }}...</td>
+                <td>{% if c.evidencia_foto_url %}<a href="/{{ c.evidencia_foto_url }}" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-image"></i></a>{% else %}-{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

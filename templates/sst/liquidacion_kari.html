@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Liquidacion Kari - Proyectos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-clipboard-list me-2 text-primary"></i>Liquidacion de Proyectos - Kari Rodriguez</h2>
+    <a href="{{ url_for('nueva_liquidacion_kari') }}" class="btn btn-cv"><i class="fas fa-plus me-2"></i>Nueva Liquidacion</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-yellow p-3 text-center">
+            <h3>{{ liquidaciones|selectattr('estado_liquidacion', 'equalto', 'PENDIENTE')|list|length }}</h3>
+            <small>Pendientes</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi" style="background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%); color: white;">
+            <div class="p-3 text-center">
+                <h3>{{ liquidaciones|selectattr('estado_liquidacion', 'equalto', 'EN REVISION')|list|length }}</h3>
+                <small>En Revision</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-green p-3 text-center">
+            <h3>{{ liquidaciones|selectattr('estado_liquidacion', 'equalto', 'APROBADO')|list|length }}</h3>
+            <small>Aprobados</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-red p-3 text-center">
+            <h3>{{ liquidaciones|selectattr('estado_liquidacion', 'equalto', 'RECHAZADO')|list|length }}</h3>
+            <small>Rechazados</small>
+        </div>
+    </div>
+</div>
+
+<div class="table-custom">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr><th>ID</th><th>Proyecto</th><th>Fecha Liquidacion</th><th>Liquidado Por</th><th>Estado</th><th>Observaciones</th><th>Aprobado Por</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for l in liquidaciones %}
+            <tr>
+                <td><strong>LQ-{{ "%03d" % l.id }}</strong></td>
+                <td><span class="badge badge-{{ l.codigo.split('-')[0]|lower }}">{{ l.codigo }}</span> - {{ l.proyecto_nombre }}</td>
+                <td>{{ l.fecha_liquidacion }}</td>
+                <td>{{ l.liquidado_nombre }}</td>
+                <td><span class="badge bg-{{ 'warning' if l.estado_liquidacion == 'PENDIENTE' else 'warning' if l.estado_liquidacion == 'EN REVISION' else 'success' if l.estado_liquidacion == 'APROBADO' else 'danger' if l.estado_liquidacion == 'RECHAZADO' else 'info' }}">{{ l.estado_liquidacion }}</span></td>
+                <td>{{ l.observaciones_liquidacion or '-' }}</td>
+                <td>{{ l.aprobado_nombre or '-' }}</td>
+                <td>
+                    {% if l.estado_liquidacion in ['PENDIENTE', 'EN REVISION', 'OBSERVADO'] and session.rol == 'supervisor' %}
+                    <form method="POST" action="{{ url_for('aprobar_liquidacion_kari', id=l.id) }}" class="d-inline">
+                        <input type="hidden" name="estado" value="APROBADO">
+                        <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check"></i></button>
+                    </form>
+                    <form method="POST" action="{{ url_for('aprobar_liquidacion_kari', id=l.id) }}" class="d-inline">
+                        <input type="hidden" name="estado" value="RECHAZADO">
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></button>
+                    </form>
+                    <form method="POST" action="{{ url_for('aprobar_liquidacion_kari', id=l.id) }}" class="d-inline">
+                        <input type="hidden" name="estado" value="OBSERVADO">
+                        <button type="submit" class="btn btn-sm btn-warning"><i class="fas fa-exclamation"></i></button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

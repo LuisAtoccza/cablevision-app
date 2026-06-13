@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}ATS - Analisis de Trabajo Seguro{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-file-alt me-2 text-primary"></i>Analisis de Trabajo Seguro (ATS)</h2>
+    <a href="{{ url_for('nuevo_ats') }}" class="btn btn-cv"><i class="fas fa-plus me-2"></i>Nuevo ATS</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-yellow p-3 text-center">
+            <h3>{{ ats_list|selectattr('estado', 'equalto', 'PENDIENTE')|list|length }}</h3>
+            <small>Pendientes</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-green p-3 text-center">
+            <h3>{{ ats_list|selectattr('estado', 'equalto', 'APROBADO')|list|length }}</h3>
+            <small>Aprobados</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-red p-3 text-center">
+            <h3>{{ ats_list|selectattr('estado', 'equalto', 'RECHAZADO')|list|length }}</h3>
+            <small>Rechazados</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-blue p-3 text-center">
+            <h3>{{ ats_list|length }}</h3>
+            <small>Total</small>
+        </div>
+    </div>
+</div>
+
+<div class="table-custom">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr><th>ID</th><th>Fecha</th><th>Proyecto</th><th>Responsable</th><th>Actividad</th><th>EPP Requeridos</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+            {% for a in ats_list %}
+            <tr>
+                <td><strong>ATS-{{ "%03d" % a.id }}</strong></td>
+                <td>{{ a.fecha }}</td>
+                <td>{{ a.proyecto_codigo or 'Sin proyecto' }}</td>
+                <td>{{ a.usuario_nombre }}</td>
+                <td>{{ a.actividad[:50] }}...</td>
+                <td><span class="badge bg-info">{{ a.epp_requeridos or 'N/A' }}</span></td>
+                <td><span class="badge bg-{{ 'warning' if a.estado == 'PENDIENTE' else 'success' if a.estado == 'APROBADO' else 'danger' if a.estado == 'RECHAZADO' else 'secondary' }}">{{ a.estado }}</span></td>
+                <td>
+                    {% if a.estado == 'PENDIENTE' and session.rol == 'supervisor' %}
+                    <form method="POST" action="{{ url_for('aprobar_ats', id=a.id) }}" class="d-inline">
+                        <input type="hidden" name="estado" value="APROBADO">
+                        <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check"></i></button>
+                    </form>
+                    <form method="POST" action="{{ url_for('aprobar_ats', id=a.id) }}" class="d-inline">
+                        <input type="hidden" name="estado" value="RECHAZADO">
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></button>
+                    </form>
+                    {% endif %}
+                    {% if a.archivo_url %}
+                    <a href="/{{ a.archivo_url }}" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-download"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

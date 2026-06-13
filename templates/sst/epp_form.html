@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Foto EPP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-plus me-2 text-primary"></i>Nueva Foto de EPP</h2>
+    <a href="{{ url_for('epps') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Fecha *</label>
+                    <input type="date" name="fecha" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Personal *</label>
+                    <select name="usuario_id" class="form-select" required>
+                        <option value="">Seleccione...</option>
+                        {% for u in usuarios %}<option value="{{ u.id }}">{{ u.nombre }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Proyecto (opcional)</label>
+                    <select name="proyecto_id" class="form-select">
+                        <option value="">Sin proyecto</option>
+                        {% for p in proyectos %}<option value="{{ p.id }}">{{ p.codigo }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Tipo de EPP *</label>
+                    <select name="tipo_epp" class="form-select" required>
+                        <option value="">Seleccione...</option>
+                        <option value="CASCO">CASCO</option>
+                        <option value="CHALECO">CHALECO</option>
+                        <option value="GUANTES">GUANTES</option>
+                        <option value="LENTES">LENTES</option>
+                        <option value="BOTAS">BOTAS</option>
+                        <option value="ARNES">ARNES</option>
+                        <option value="TAPAOIDOS">TAPAOIDOS</option>
+                        <option value="OTROS">OTROS</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Foto *</label>
+                <input type="file" name="foto" class="form-control" accept="image/*" required>
+                <small class="text-muted">Suba una foto clara del EPP</small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Estado del EPP *</label>
+                <select name="estado_epp" class="form-select" required>
+                    <option value="CORRECTO">CORRECTO</option>
+                    <option value="DANADO">DANADO</option>
+                    <option value="INCOMPLETO">INCOMPLETO</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Observaciones</label>
+                <textarea name="observaciones" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('epps') }}" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-cv"><i class="fas fa-camera me-2"></i>Guardar Foto</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

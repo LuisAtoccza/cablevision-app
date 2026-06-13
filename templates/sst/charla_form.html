@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Charla SST{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-plus me-2 text-primary"></i>Nueva Charla de 5 Minutos</h2>
+    <a href="{{ url_for('charlas') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Fecha *</label>
+                    <input type="date" name="fecha" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Instructor *</label>
+                    <select name="instructor_id" class="form-select" required>
+                        <option value="">Seleccione...</option>
+                        {% for u in usuarios %}<option value="{{ u.id }}">{{ u.nombre }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tema *</label>
+                <input type="text" name="tema" class="form-control" placeholder="Ej: Uso correcto del arnes de seguridad" required>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Duracion (minutos)</label>
+                    <input type="number" name="duracion" class="form-control" value="5" min="1" max="60">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Cantidad de Asistentes</label>
+                    <input type="number" name="cantidad_asistentes" class="form-control" min="1">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Asistentes (nombres)</label>
+                <textarea name="asistentes" class="form-control" rows="2" placeholder="Ej: Mayer Bonilla, Raul Lapa, Cesar Armuto..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Resumen de la Charla</label>
+                <textarea name="resumen" class="form-control" rows="3" placeholder="Resumen de los puntos tratados en la charla..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Evidencia Fotografica</label>
+                <input type="file" name="evidencia" class="form-control" accept="image/*">
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('charlas') }}" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-cv"><i class="fas fa-save me-2"></i>Guardar Charla</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

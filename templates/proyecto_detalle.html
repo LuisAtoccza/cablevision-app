@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{{ proyecto.codigo }} - Detalle{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><span class="badge badge-{{ proyecto.prefijo|lower }} fs-5">{{ proyecto.codigo }}</span></h2>
+        <p class="text-muted mb-0">{{ proyecto.nombre }}</p>
+    </div>
+    <a href="{{ url_for('proyectos') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Volver</a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white"><h5 class="mb-0"><i class="fas fa-info-circle me-2 text-primary"></i>Informacion del Proyecto</h5></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Tipo:</strong> <span class="badge badge-{{ proyecto.prefijo|lower }}">{{ proyecto.prefijo }} - {{ proyecto.tipo_nombre }}</span></p>
+                        <p><strong>Estado:</strong> <span class="status-badge semaforo-{{ proyecto.color_semaforo|lower }}">{{ proyecto.estado_nombre }}</span></p>
+                        <p><strong>Zona:</strong> {{ proyecto.zona_distrito or '-' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Fecha Inicio:</strong> {{ proyecto.fecha_inicio or '-' }}</p>
+                        <p><strong>Fecha Fin Estimada:</strong> {{ proyecto.fecha_fin_estimada or '-' }}</p>
+                        <p><strong>Fecha Fin Real:</strong> {{ proyecto.fecha_fin_real or '-' }}</p>
+                    </div>
+                </div>
+                <hr>
+                <p><strong>Avance:</strong></p>
+                <div class="progress" style="height: 30px;">
+                    <div class="progress-bar bg-{{ 'success' if proyecto.avance >= 80 else 'warning' if proyecto.avance >= 50 else 'danger' }} fs-6" style="width: {{ proyecto.avance }}%">{{ proyecto.avance }}%</div>
+                </div>
+                <hr>
+                <p><strong>Certificacion:</strong> <span class="badge bg-{{ 'success' if proyecto.certificacion_estado == 'APROBADO' else 'warning' }}">{{ proyecto.certificacion_estado }}</span></p>
+                <p><strong>Plano Semaforico:</strong> <span class="badge bg-{{ 'success' if proyecto.plano_semaforo == 'VERDE' else 'warning' if proyecto.plano_semaforo == 'NARANJA' else 'danger' if proyecto.plano_semaforo == 'ROJO' else 'secondary' }}">{{ proyecto.plano_semaforo }}</span></p>
+                <p><strong>Observaciones:</strong> {{ proyecto.observaciones or 'Sin observaciones' }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white"><h5 class="mb-0"><i class="fas fa-hard-hat me-2 text-primary"></i>SST - Seguridad</h5></div>
+            <div class="card-body">
+                <p><strong>ATS Registrados:</strong> {{ ats_list|length }}</p>
+                <p><strong>Fotos EPPs:</strong> {{ epps|length }}</p>
+                <a href="{{ url_for('nuevo_ats') }}" class="btn btn-sm btn-outline-primary w-100 mb-2">+ Nuevo ATS</a>
+                <a href="{{ url_for('nuevo_epp') }}" class="btn btn-sm btn-outline-success w-100">+ Nueva Foto EPP</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

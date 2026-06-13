@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard V2 - Cablevision Peru{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard de Control V2</h2>
+    <span class="text-muted">{{ now.strftime('%d/%m/%Y %H:%M') }}</span>
+</div>
+
+<!-- KPIs Proyectos -->
+<div class="row mb-4">
+    <div class="col-md-2 col-6 mb-3">
+        <div class="card card-kpi kpi-blue p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div><h3 class="mb-0">{{ total_proyectos }}</h3><small>Total Proyectos</small></div>
+                <i class="fas fa-project-diagram fa-2x opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+        <div class="card card-kpi kpi-yellow p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div><h3 class="mb-0">{{ activos }}</h3><small>En Proceso</small></div>
+                <i class="fas fa-play-circle fa-2x opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+        <div class="card card-kpi kpi-green p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div><h3 class="mb-0">{{ completados }}</h3><small>Completados</small></div>
+                <i class="fas fa-check-circle fa-2x opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+        <div class="card card-kpi kpi-purple p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div><h3 class="mb-0">{{ asistencia_hoy }}</h3><small>Asistencia Hoy</small></div>
+                <i class="fas fa-clipboard-check fa-2x opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+        <div class="card card-kpi kpi-red p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div><h3 class="mb-0">{{ ats_pendientes }}</h3><small>ATS Pendientes</small></div>
+                <i class="fas fa-file-alt fa-2x opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6 mb-3">
+        <div class="card card-kpi" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="d-flex justify-content-between align-items-center p-3">
+                <div><h3 class="mb-0">{{ charlas_mes }}</h3><small>Charlas Mes</small></div>
+                <i class="fas fa-comments fa-2x opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Proyectos por Tipo -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3"><h5 class="mb-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Proyectos por Tipo</h5></div>
+            <div class="card-body"><canvas id="chartTipos" height="200"></canvas></div>
+        </div>
+    </div>
+    <!-- Asistencia Hoy -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3"><h5 class="mb-0"><i class="fas fa-clipboard-check me-2 text-primary"></i>Asistencia de Hoy</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light"><tr><th>Nombre</th><th>Entrada</th><th>Salida</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            {% for a in asistencia_hoy_list %}
+                            <tr>
+                                <td>{{ a.nombre }}</td>
+                                <td>{{ a.hora_entrada }}</td>
+                                <td>{{ a.hora_salida }}</td>
+                                <td><span class="badge bg-{{ 'success' if a.estado == 'PRESENTE' else 'warning' if a.estado == 'TARDANZA' else 'danger' }}">{{ a.estado }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Proyectos Urgentes -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-danger text-white"><h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Proyectos Proximos a Vencer</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>Codigo</th><th>Tipo</th><th>Nombre</th><th>Estado</th><th>Vence</th><th>Avance</th><th>Accion</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for p in urgentes %}
+                            <tr>
+                                <td><strong>{{ p.codigo }}</strong></td>
+                                <td><span class="badge badge-{{ p.prefijo|lower }}">{{ p.prefijo }}</span></td>
+                                <td>{{ p.nombre }}</td>
+                                <td><span class="status-badge semaforo-{{ p.color_semaforo|lower }}">{{ p.estado_nombre }}</span></td>
+                                <td>{{ p.fecha_fin_estimada }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-{{ 'success' if p.avance >= 80 else 'warning' if p.avance >= 50 else 'danger' }}" style="width: {{ p.avance }}%">{{ p.avance }}%</div>
+                                    </div>
+                                </td>
+                                <td><a href="{{ url_for('ver_proyecto', id=p.id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Equipos -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 pt-3"><h5 class="mb-0"><i class="fas fa-users me-2 text-primary"></i>Estado de Equipos</h5></div>
+            <div class="card-body">
+                <div class="row">
+                    {% for e in equipos %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-{{ 'success' if e.estado == 'disponible' else 'warning' if e.estado == 'ocupado' else 'primary' }}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="card-title mb-1">{{ e.nombre }}</h6>
+                                        <p class="text-muted mb-1" style="font-size: 0.85rem;">{% if e.miembro1 %}{{ e.miembro1 }}{% endif %}{% if e.miembro2 %} / {{ e.miembro2 }}{% endif %}</p>
+                                        <span class="badge bg-{{ 'success' if e.estado == 'disponible' else 'warning' if e.estado == 'ocupado' else 'primary' }}">{{ e.estado|upper }}</span>
+                                    </div>
+                                    <div class="text-end"><div class="h4 mb-0">{{ e.rendimiento }}%</div><small class="text-muted">Rendimiento</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+new Chart(document.getElementById('chartTipos'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ proyectos_tipo|map(attribute='prefijo')|list|tojson }},
+        datasets: [{
+            data: {{ proyectos_tipo|map(attribute='cantidad')|list|tojson }},
+            backgroundColor: ['#0033A0', '#FF6B00', '#28a745', '#dc3545', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997', '#6610f2', '#6c757d']
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}

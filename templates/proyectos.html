@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Proyectos - Cablevision Peru{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-project-diagram me-2 text-primary"></i>Gestion de Proyectos</h2>
+    <a href="{{ url_for('nuevo_proyecto') }}" class="btn btn-cv"><i class="fas fa-plus me-2"></i>Nuevo Proyecto</a>
+</div>
+
+<div class="table-custom">
+    <table class="table table-hover mb-0">
+        <thead>
+            <tr>
+                <th>Codigo</th><th>Tipo</th><th>Nombre</th><th>Zona</th><th>Estado</th><th>Responsable</th><th>Vence</th><th>Avance</th><th>Cert.</th><th>Plano</th><th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in proyectos %}
+            <tr>
+                <td><strong>{{ p.codigo }}</strong></td>
+                <td><span class="badge badge-{{ p.prefijo|lower }}">{{ p.prefijo }}</span></td>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.zona_distrito or '-' }}</td>
+                <td><span class="status-badge semaforo-{{ p.color_semaforo|lower }}">{{ p.estado_nombre }}</span></td>
+                <td>{{ p.responsable_nombre or 'Por asignar' }}</td>
+                <td>{{ p.fecha_fin_estimada or '-' }}</td>
+                <td>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-{{ 'success' if p.avance >= 80 else 'warning' if p.avance >= 50 else 'danger' }}" style="width: {{ p.avance }}%">{{ p.avance }}%</div>
+                    </div>
+                </td>
+                <td><span class="badge bg-{{ 'success' if p.certificacion_estado == 'APROBADO' else 'warning' if p.certificacion_estado == 'PENDIENTE' else 'danger' }}">{{ p.certificacion_estado }}</span></td>
+                <td><span class="badge bg-{{ 'success' if p.plano_semaforo == 'VERDE' else 'warning' if p.plano_semaforo == 'PENDIENTE' else 'danger' if p.plano_semaforo == 'ROJO' else 'warning' }}">{{ p.plano_semaforo }}</span></td>
+                <td><a href="{{ url_for('ver_proyecto', id=p.id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

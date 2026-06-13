@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Configuracion - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-cogs me-2 text-primary"></i>Configuracion del Sistema</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h5 class="mb-0">Tipos de Proyectos</h5></div>
+            <div class="card-body">
+                <table class="table">
+                    <thead><tr><th>Prefijo</th><th>Nombre</th><th>Descripcion</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        {% for t in tipos %}
+                        <tr>
+                            <td><strong>{{ t.prefijo }}</strong></td>
+                            <td>{{ t.nombre }}</td>
+                            <td>{{ t.descripcion }}</td>
+                            <td><span class="badge bg-{{ 'success' if t.activo else 'danger' }}">{{ 'Activo' if t.activo else 'Inactivo' }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h5 class="mb-0">Estados de Proyecto</h5></div>
+            <div class="card-body">
+                <table class="table">
+                    <thead><tr><th>Estado</th><th>Color</th><th>Descripcion</th></tr></thead>
+                    <tbody>
+                        {% for e in estados %}
+                        <tr>
+                            <td><strong>{{ e.estado }}</strong></td>
+                            <td><span class="badge bg-{{ 'success' if e.color_semaforo == 'VERDE' else 'warning' if e.color_semaforo == 'AMARILLO' else 'danger' if e.color_semaforo == 'ROJO' else 'warning' if e.color_semaforo == 'NARANJA' else 'secondary' }}">{{ e.color_semaforo }}</span></td>
+                            <td>{{ e.descripcion }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white"><h5 class="mb-0">Parametros del Sistema</h5></div>
+    <div class="card-body">
+        <table class="table">
+            <thead><tr><th>Parametro</th><th>Valor</th><th>Descripcion</th></tr></thead>
+            <tbody>
+                {% for c in configuracion %}
+                <tr>
+                    <td><strong>{{ c.parametro }}</strong></td>
+                    <td><span class="badge bg-primary">{{ c.valor }}</span></td>
+                    <td>{{ c.descripcion }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

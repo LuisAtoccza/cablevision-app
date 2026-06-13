@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Fotos EPPs - SST{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-hard-hat me-2 text-primary"></i>Fotos de Equipos de Proteccion Personal (EPPs)</h2>
+    <a href="{{ url_for('nuevo_epp') }}" class="btn btn-cv"><i class="fas fa-plus me-2"></i>Nueva Foto EPP</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-green p-3 text-center">
+            <h3>{{ epps|selectattr('estado_epp', 'equalto', 'CORRECTO')|list|length }}</h3>
+            <small>Correctos</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-yellow p-3 text-center">
+            <h3>{{ epps|selectattr('estado_epp', 'equalto', 'DANADO')|list|length }}</h3>
+            <small>Danados</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-red p-3 text-center">
+            <h3>{{ epps|selectattr('estado_epp', 'equalto', 'INCOMPLETO')|list|length }}</h3>
+            <small>Incompletos</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-blue p-3 text-center">
+            <h3>{{ epps|length }}</h3>
+            <small>Total Fotos</small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% for e in epps %}
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="badge bg-{{ 'success' if e.estado_epp == 'CORRECTO' else 'warning' if e.estado_epp == 'DANADO' else 'danger' }}">{{ e.estado_epp }}</span>
+                <small class="text-muted">{{ e.fecha }}</small>
+            </div>
+            <div class="card-body text-center">
+                {% if e.foto_url %}
+                <img src="/{{ e.foto_url }}" class="img-fluid rounded mb-3" style="max-height: 200px;" alt="Foto EPP">
+                {% else %}
+                <div class="bg-light rounded p-4 mb-3"><i class="fas fa-image fa-3x text-muted"></i></div>
+                {% endif %}
+                <h6 class="mb-1">{{ e.usuario_nombre }}</h6>
+                <p class="text-muted mb-1">{{ e.tipo_epp }}</p>
+                {% if e.proyecto_codigo %}<p class="text-muted small">{{ e.proyecto_codigo }}</p>{% endif %}
+                {% if e.observaciones %}<p class="text-muted small">{{ e.observaciones }}</p>{% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

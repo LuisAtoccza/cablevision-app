@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Informe Mensual SST{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chart-bar me-2 text-primary"></i>Informe Mensual SST</h2>
+    <form method="GET" class="d-flex">
+        <input type="month" name="mes" class="form-control me-2" value="{{ mes }}">
+        <button type="submit" class="btn btn-cv"><i class="fas fa-search"></i></button>
+    </form>
+</div>
+
+<div class="alert alert-info mb-4">
+    <i class="fas fa-info-circle me-2"></i>Informe correspondiente al mes: <strong>{{ mes }}</strong>
+</div>
+
+<!-- RESUMEN ASISTENCIA -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>1. RESUMEN DE ASISTENCIAS</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr><th>Nombre</th><th>Presentes</th><th>Tardanzas</th><th>Ausentes</th><th>Total Dias</th><th>% Asistencia</th></tr>
+                </thead>
+                <tbody>
+                    {% for r in resumen_asistencia %}
+                    <tr>
+                        <td><strong>{{ r.nombre }}</strong></td>
+                        <td><span class="badge bg-success">{{ r.presentes or 0 }}</span></td>
+                        <td><span class="badge bg-warning">{{ r.tardanzas or 0 }}</span></td>
+                        <td><span class="badge bg-danger">{{ r.ausentes or 0 }}</span></td>
+                        <td>{{ r.total or 0 }}</td>
+                        <td>
+                            {% set total = r.total or 1 %}
+                            {% set porcentaje = ((r.presentes or 0) / total * 100)|round %}
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-{{ 'success' if porcentaje >= 90 else 'warning' if porcentaje >= 75 else 'danger' }}" style="width: {{ porcentaje }}%">{{ porcentaje }}%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ATS DEL MES -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>2. ANALISIS DE TRABAJO SEGURO (ATS)</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr><th>Fecha</th><th>Responsable</th><th>Actividad</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                    {% for a in ats_mes %}
+                    <tr>
+                        <td>{{ a.fecha }}</td>
+                        <td>{{ a.usuario_nombre }}</td>
+                        <td>{{ a.actividad[:60] }}...</td>
+                        <td><span class="badge bg-{{ 'warning' if a.estado == 'PENDIENTE' else 'success' if a.estado == 'APROBADO' else 'danger' }}">{{ a.estado }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="p-3">
+            <strong>Total ATS del mes:</strong> {{ ats_mes|length }} | 
+            <strong>Aprobados:</strong> {{ ats_mes|selectattr('estado', 'equalto', 'APROBADO')|list|length }} | 
+            <strong>Pendientes:</strong> {{ ats_mes|selectattr('estado', 'equalto', 'PENDIENTE')|list|length }}
+        </div>
+    </div>
+</div>
+
+<!-- CHARLAS DEL MES -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-comments me-2"></i>3. CHARLAS DE 5 MINUTOS SST</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr><th>Fecha</th><th>Tema</th><th>Instructor</th><th>Asistentes</th><th>Duracion</th></tr>
+                </thead>
+                <tbody>
+                    {% for c in charlas_mes %}
+                    <tr>
+                        <td>{{ c.fecha }}</td>
+                        <td><strong>{{ c.tema }}</strong></td>
+                        <td>{{ c.instructor_nombre }}</td>
+                        <td>{{ c.cantidad_asistentes }} personas</td>
+                        <td>{{ c.duracion_minutos }} min</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="p-3">
+            <strong>Total Charlas:</strong> {{ charlas_mes|length }} | 
+            <strong>Total Asistentes:</strong> {{ charlas_mes|sum(attribute='cantidad_asistentes') }} | 
+            <strong>Tiempo Total:</strong> {{ charlas_mes|sum(attribute='duracion_minutos') }} minutos
+        </div>
+    </div>
+</div>
+
+<!-- FOTOS EPPs DEL MES -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-hard-hat me-2"></i>4. FOTOS DE EPPs</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr><th>Fecha</th><th>Personal</th><th>Tipo EPP</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                    {% for e in epps_mes %}
+                    <tr>
+                        <td>{{ e.fecha }}</td>
+                        <td>{{ e.usuario_nombre }}</td>
+                        <td>{{ e.tipo_epp }}</td>
+                        <td><span class="badge bg-{{ 'success' if e.estado_epp == 'CORRECTO' else 'warning' if e.estado_epp == 'DANADO' else 'danger' }}">{{ e.estado_epp }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="p-3">
+            <strong>Total Fotos:</strong> {{ epps_mes|length }} | 
+            <strong>Correctos:</strong> {{ epps_mes|selectattr('estado_epp', 'equalto', 'CORRECTO')|list|length }} | 
+            <strong>Danados:</strong> {{ epps_mes|selectattr('estado_epp', 'equalto', 'DANADO')|list|length }} | 
+            <strong>Incompletos:</strong> {{ epps_mes|selectattr('estado_epp', 'equalto', 'INCOMPLETO')|list|length }}
+        </div>
+    </div>
+</div>
+
+<!-- BOTON EXPORTAR -->
+<div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+    <button class="btn btn-outline-primary" onclick="window.print()"><i class="fas fa-print me-2"></i>Imprimir / PDF</button>
+    <a href="#" class="btn btn-outline-success"><i class="fas fa-file-excel me-2"></i>Exportar Excel</a>
+</div>
+{% endblock %}

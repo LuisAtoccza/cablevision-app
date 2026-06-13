@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo ATS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-plus me-2 text-primary"></i>Nuevo Analisis de Trabajo Seguro</h2>
+    <a href="{{ url_for('ats') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Proyecto (opcional)</label>
+                    <select name="proyecto_id" class="form-select">
+                        <option value="">Sin proyecto</option>
+                        {% for p in proyectos %}<option value="{{ p.id }}">{{ p.codigo }} - {{ p.nombre }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Fecha *</label>
+                    <input type="date" name="fecha" class="form-control" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Responsable *</label>
+                <select name="usuario_id" class="form-select" required>
+                    <option value="">Seleccione...</option>
+                    {% for u in usuarios %}<option value="{{ u.id }}">{{ u.nombre }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Actividad a Realizar *</label>
+                <textarea name="actividad" class="form-control" rows="2" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Riesgos Identificados</label>
+                <textarea name="riesgos_identificados" class="form-control" rows="2" placeholder="Ej: Caida de postes, contacto con cables electricos, corte por herramientas..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Medidas Preventivas</label>
+                <textarea name="medidas_preventivas" class="form-control" rows="2" placeholder="Ej: Uso de arnes, distancia minima 3m de cables electricos, senalizacion..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">EPP Requeridos</label>
+                <select name="epp_requeridos" class="form-select">
+                    <option value="">Seleccione...</option>
+                    <option value="CASCO, CHALECO, GUANTES">CASCO, CHALECO, GUANTES</option>
+                    <option value="CASCO, CHALECO, GUANTES, ARNES">CASCO, CHALECO, GUANTES, ARNES</option>
+                    <option value="CASCO, CHALECO, GUANTES, LENTES">CASCO, CHALECO, GUANTES, LENTES</option>
+                    <option value="CASCO, CHALECO, GUANTES, ARNES, LENTES">CASCO, CHALECO, GUANTES, ARNES, LENTES</option>
+                    <option value="CASCO, CHALECO, GUANTES, BOTAS">CASCO, CHALECO, GUANTES, BOTAS</option>
+                    <option value="TODOS LOS EPP">TODOS LOS EPP</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Adjuntar Archivo (PDF, foto)</label>
+                <input type="file" name="archivo" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Observaciones</label>
+                <textarea name="observaciones" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('ats') }}" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-cv"><i class="fas fa-save me-2"></i>Guardar ATS</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

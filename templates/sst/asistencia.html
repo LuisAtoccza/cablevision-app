@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Asistencia - SST{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-clipboard-check me-2 text-primary"></i>Control de Asistencia</h2>
+    <form method="GET" class="d-flex">
+        <input type="date" name="fecha" class="form-control me-2" value="{{ fecha }}">
+        <button type="submit" class="btn btn-cv"><i class="fas fa-search"></i></button>
+    </form>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-green p-3 text-center">
+            <h3>{{ asistencia|selectattr('estado', 'equalto', 'PRESENTE')|list|length }}</h3>
+            <small>Presentes</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-yellow p-3 text-center">
+            <h3>{{ asistencia|selectattr('estado', 'equalto', 'TARDANZA')|list|length }}</h3>
+            <small>Tardanzas</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-red p-3 text-center">
+            <h3>{{ asistencia|selectattr('estado', 'equalto', 'AUSENTE')|list|length }}</h3>
+            <small>Ausentes</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-kpi kpi-blue p-3 text-center">
+            <h3>{{ asistencia|length }}</h3>
+            <small>Total Registros</small>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Registros del {{ fecha }}</h5>
+        <button class="btn btn-cv" data-bs-toggle="modal" data-bs-target="#modalAsistencia"><i class="fas fa-plus me-2"></i>Registrar Asistencia</button>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr><th>Nombre</th><th>Rol</th><th>Entrada</th><th>Salida</th><th>Estado</th><th>Observaciones</th></tr>
+                </thead>
+                <tbody>
+                    {% for a in asistencia %}
+                    <tr>
+                        <td><strong>{{ a.nombre }}</strong></td>
+                        <td><span class="badge bg-secondary">{{ a.rol }}</span></td>
+                        <td>{{ a.hora_entrada or '-' }}</td>
+                        <td>{{ a.hora_salida or '-' }}</td>
+                        <td><span class="badge bg-{{ 'success' if a.estado == 'PRESENTE' else 'warning' if a.estado == 'TARDANZA' else 'danger' if a.estado == 'AUSENTE' else 'info' }}">{{ a.estado }}</span></td>
+                        <td>{{ a.observaciones or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalAsistencia" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Asistencia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('registrar_asistencia') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="fecha" value="{{ fecha }}">
+                    <div class="mb-3">
+                        <label class="form-label">Personal *</label>
+                        <select name="usuario_id" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            {% for u in usuarios %}<option value="{{ u.id }}">{{ u.nombre }} ({{ u.rol }})</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Hora Entrada</label>
+                            <input type="time" name="hora_entrada" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Hora Salida</label>
+                            <input type="time" name="hora_salida" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estado *</label>
+                        <select name="estado" class="form-select" required>
+                            <option value="PRESENTE">PRESENTE</option>
+                            <option value="TARDANZA">TARDANZA</option>
+                            <option value="AUSENTE">AUSENTE</option>
+                            <option value="PERMISO">PERMISO</option>
+                            <option value="FERIADO">FERIADO</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea name="observaciones" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-cv">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

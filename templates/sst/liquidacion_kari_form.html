@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Liquidacion Kari{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-plus me-2 text-primary"></i>Nueva Liquidacion de Proyecto</h2>
+    <a href="{{ url_for('liquidacion_kari') }}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Volver</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Proyecto Completado *</label>
+                <select name="proyecto_id" class="form-select" required>
+                    <option value="">Seleccione proyecto completado...</option>
+                    {% for p in proyectos %}<option value="{{ p.id }}">{{ p.codigo }} - {{ p.nombre }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Fecha de Liquidacion *</label>
+                <input type="date" name="fecha_liquidacion" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Observaciones de Liquidacion</label>
+                <textarea name="observaciones" class="form-control" rows="3" placeholder="Observaciones sobre la liquidacion del proyecto..."></textarea>
+            </div>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>La liquidacion sera registrada a nombre de <strong>Kari Rodriguez</strong> y quedara en estado PENDIENTE hasta que el supervisor la apruebe.
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('liquidacion_kari') }}" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-cv"><i class="fas fa-save me-2"></i>Registrar Liquidacion</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
